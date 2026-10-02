@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import CurrencyBar from './CurrencyBar';
+import CurrencyBar from '@/components/CurrencyBar';
 
 export default function Header() {
   return (
