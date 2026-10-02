@@ -2,44 +2,36 @@
 import { useEffect, useState } from 'react';
 
 export default function CurrencyBar() {
-  const [rates, setRates] = useState({ USD: '...', EUR: '...' });
+  const [kurlar, setKurlar] = useState(null);
 
   useEffect(() => {
-    // Canlı kur verisi çeken API çağrısı
-    fetch('https://api.exchangerate-api.com/v4/latest/USD')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.rates) {
-          const tryRate = data.rates.TRY || 34.20;
-          const eurRate = data.rates.EUR ? (tryRate / data.rates.EUR) : 37.50;
-          setRates({
-            USD: tryRate.toFixed(2),
-            EUR: eurRate.toFixed(2)
-          });
-        }
-      })
-      .catch(() => {
-        // Hata durumunda varsayılan gösterim
-        setRates({ USD: '34.25', EUR: '37.80' });
-      });
+    async function fetchKurlar() {
+      try {
+        const res = await fetch('/api/doviz');
+        const json = await res.json();
+        if (json.data) setKurlar(json.data);
+      } catch (err) {
+        console.error('Döviz çekilemedi:', err);
+      }
+    }
+    fetchKurlar();
   }, []);
 
+  if (!kurlar) return null;
+
   return (
-    <div className="bg-slate-950 text-slate-300 text-xs py-1.5 px-4 border-b border-slate-800">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-6 font-medium">
-          <span className="text-amber-400 font-semibold flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            Piyasalar (Canlı):
-          </span>
-          <div className="flex gap-4">
-            <span>USD/TRY: <strong className="text-white">{rates.USD} ₺</strong></span>
-            <span>EUR/TRY: <strong className="text-white">{rates.EUR} ₺</strong></span>
-          </div>
-        </div>
-        <div className="hidden sm:block text-slate-400 text-[11px]">
-          Mali Müşavirlik & Finans Danışmanlığı
-        </div>
+    <div className="bg-slate-900 text-white text-xs py-2 px-4 flex justify-between items-center border-b border-slate-800">
+      <div className="flex items-center gap-4">
+        <span className="font-semibold text-amber-400">Piyasa Kurları:</span>
+        <span className="flex items-center gap-1">
+          <strong className="text-slate-300">USD/TRY:</strong> ₺{kurlar.USD}
+        </span>
+        <span className="flex items-center gap-1">
+          <strong className="text-slate-300">EUR/TRY:</strong> ₺{kurlar.EUR}
+        </span>
+      </div>
+      <div className="text-slate-400 hidden sm:block text-[10px]">
+        Son Güncelleme: {kurlar.guncelleme}
       </div>
     </div>
   );
