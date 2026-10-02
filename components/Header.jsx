@@ -1,49 +1,40 @@
 'use client';
-import { useState } from 'react';
+import Link from 'next/link';
+import CurrencyBar from '@/components/CurrencyBar';
 
-export default function FAQ() {
-  const faqs = [
-    {
-      q: 'Şirket kuruluşu ne kadar sürer?',
-      a: 'Şahıs şirketleri 1 iş günü, limited ve anonim şirketler ise ortalama 2-3 iş günü içerisinde tescil edilerek faaliyete geçer.'
-    },
-    {
-      q: 'E-Fatura sistemine geçiş zorunlu mu?',
-      a: 'Belirli ciro limitlerini aşan mükellefler ve e-ticaret yapan işletmeler için e-fatura / e-arşiv kullanımı zorunludur.'
-    },
-    {
-      q: 'Aylık beyanname takvimi nasıl takip edilir?',
-      a: 'KDV, Muhtasar, Geçici Vergi ve Kurumlar Vergisi beyanname tarihleri mali takvime göre büromuzca takip edilir ve bilgilendirme yapılır.'
-    }
-  ];
-
-  const [openIndex, setOpenIndex] = useState(null);
-
+export default function Header() {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center text-slate-800 mb-8">
-          Sıkça Sorulan Sorular
-        </h2>
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <div key={index} className="border border-slate-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full text-left p-4 bg-slate-50 hover:bg-slate-100 font-semibold text-slate-800 flex justify-between items-center transition"
-              >
-                <span>{faq.q}</span>
-                <span>{openIndex === index ? '−' : '+'}</span>
-              </button>
-              {openIndex === index && (
-                <div className="p-4 bg-white text-slate-600 border-t border-slate-200 text-sm">
-                  {faq.a}
-                </div>
-              )}
+    <header className="w-full">
+      {/* En Üstteki Döviz Bandı */}
+      <CurrencyBar />
+
+      {/* Navigasyon Menüsü */}
+      <nav className="bg-slate-900 text-white border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="bg-amber-500 text-slate-950 font-black text-xl w-10 h-10 rounded-lg flex items-center justify-center">
+              M
             </div>
-          ))}
+            <div>
+              <span className="font-extrabold text-lg block leading-none">YÜKSEL</span>
+              <span className="text-[10px] text-amber-400 tracking-wider">MALİ MÜŞAVİRLİK</span>
+            </div>
+          </Link>
+
+          <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
+            <Link href="/" className="hover:text-amber-400 transition">Ana Sayfa</Link>
+            <Link href="/hakkimizda" className="hover:text-amber-400 transition">Hakkımızda</Link>
+            <Link href="/hizmetlerimiz" className="hover:text-amber-400 transition">Hizmetlerimiz</Link>
+            <Link href="#duyurular" className="hover:text-amber-400 transition">Duyurular</Link>
+            <Link href="#blog" className="hover:text-amber-400 transition">Blog</Link>
+            <Link href="#iletisim" className="hover:text-amber-400 transition">İletişim</Link>
+          </div>
+
+          <Link href="/musteri-girisi" className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition">
+            Müşteri Girişi
+          </Link>
         </div>
-      </div>
-    </section>
+      </nav>
+    </header>
   );
 }

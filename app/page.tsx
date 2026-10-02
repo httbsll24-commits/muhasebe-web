@@ -9,11 +9,11 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50">
       <HeroSlider />
-      <NewsPanel />
-      <BlogCards />
+      <section id="duyurular"><NewsPanel /></section>
+      <section id="blog"><BlogCards /></section>
       <Services />
       <FAQ />
-      <ContactForm />
+      <section id="iletisim"><ContactForm /></section>
     </main>
   );
 }
