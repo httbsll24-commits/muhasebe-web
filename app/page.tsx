@@ -1,23 +1,19 @@
-import CurrencyBar from './components/CurrencyBar';
-import Header from './components/Header';
-import HeroSlider from './components/HeroSlider';
-import NewsPanel from './components/NewsPanel';
-import Services from './components/Services';
-import FAQ from './components/FAQ';
-import ContactForm from './components/ContactForm';
-import Footer from './components/Footer';
+import HeroSlider from "@/components/HeroSlider";
+import NewsPanel from "@/components/NewsPanel";
+import Services from "@/components/Services";
+import FAQ from "@/components/FAQ";
+import ContactForm from "@/components/ContactForm";
+import BlogCards from "@/components/BlogCards";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col bg-white">
-      <CurrencyBar />
-      <Header />
+    <div>
       <HeroSlider />
       <NewsPanel />
       <Services />
+      <BlogCards />
       <FAQ />
       <ContactForm />
-      <Footer />
-    </main>
+    </div>
   );
 }
