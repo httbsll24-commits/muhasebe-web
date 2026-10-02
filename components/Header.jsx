@@ -1,30 +1,48 @@
 'use client';
+import { useState } from 'react';
 
-export default function ContactForm() {
+export default function FAQ() {
+  const faqs = [
+    {
+      q: 'Şirket kuruluşu ne kadar sürer?',
+      a: 'Şahıs şirketleri 1 iş günü, limited ve anonim şirketler ise ortalama 2-3 iş günü içerisinde tescil edilerek faaliyete geçer.'
+    },
+    {
+      q: 'E-Fatura sistemine geçiş zorunlu mu?',
+      a: 'Belirli ciro limitlerini aşan mükellefler ve e-ticaret yapan işletmeler için e-fatura / e-arşiv kullanımı zorunludur.'
+    },
+    {
+      q: 'Aylık beyanname takvimi nasıl takip edilir?',
+      a: 'KDV, Muhtasar, Geçici Vergi ve Kurumlar Vergisi beyanname tarihleri mali takvime göre büromuzca takip edilir ve bilgilendirme yapılır.'
+    }
+  ];
+
+  const [openIndex, setOpenIndex] = useState(null);
+
   return (
-    <section className="py-16 bg-slate-50">
+    <section className="py-16 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-800">Bizimle İletişime Geçin</h2>
-          <p className="text-slate-600 mt-2">Mali danışmanlık ve muhasebe hizmetlerimiz için form doldurabilirsiniz.</p>
+        <h2 className="text-3xl font-bold text-center text-slate-800 mb-8">
+          Sıkça Sorulan Sorular
+        </h2>
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <div key={index} className="border border-slate-200 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full text-left p-4 bg-slate-50 hover:bg-slate-100 font-semibold text-slate-800 flex justify-between items-center transition"
+              >
+                <span>{faq.q}</span>
+                <span>{openIndex === index ? '−' : '+'}</span>
+              </button>
+              {openIndex === index && (
+                <div className="p-4 bg-white text-slate-600 border-t border-slate-200 text-sm">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-4 bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Ad Soyad</label>
-            <input type="text" placeholder="Adınız ve Soyadınız" className="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">E-Posta Adresi</label>
-            <input type="email" placeholder="ornek@email.com" className="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Mesajınız</label>
-            <textarea rows={4} placeholder="Talebinizi detaylandırın..." className="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
-          </div>
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition text-sm">
-            Mesaj Gönder
-          </button>
-        </form>
       </div>
     </section>
   );
