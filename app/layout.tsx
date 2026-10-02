@@ -1,34 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "SMMM & Mali Müşavirlik | Finansal Danışmanlık ve E-Dönüşüm Hizmetleri",
-  description: "Mali müşavirlik, vergi danışmanlığı, şirket kuruluşu, e-fatura ve e-defter süreçlerinde profesyonel ve güvenilir çözümler.",
-  keywords: ["Mali Müşavir", "SMMM", "Muhasebe Bürosu", "Vergi Danışmanlığı", "E-Fatura", "E-Defter", "Şirket Kuruluşu"],
-  authors: [{ name: "Mali Müşavirlik Bürosu" }],
-  openGraph: {
-    title: "SMMM & Mali Müşavirlik Bürosu",
-    description: "Mali süreçlerinizde profesyonel, şeffaf ve mevzuata uygun çözümler.",
-    url: "https://muhasebe-web.vercel.app",
-    siteName: "Mali Müşavirlik & Finansal Danışmanlık",
-    locale: "tr_TR",
-    type: "website",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  title: "Başol Mali Müşavirlik | SMMM & Finansal Danışmanlık",
+  description: "Profesyonel Mali Müşavirlik, Muhasebe, Vergi Danışmanlığı ve E-Dönüşüm Hizmetleri.",
+  keywords: ["Mali Müşavir", "SMMM", "Muhasebe Bürosu", "Vergi Danışmanlığı", "E-Fatura"],
 };
 
 export default function RootLayout({
@@ -36,12 +14,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Google Haritalar & Yerel SEO İçin Structured Data (JSON-LD)
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AccountingService",
+    "name": "Başol Mali Müşavirlik",
+    "image": "https://muhasebe-web-theta.vercel.app/logo.png",
+    "description": "Profesyonel SMMM, Muhasebe ve Vergi Danışmanlığı Hizmetleri.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "İstanbul",
+      "addressCountry": "TR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "41.0082",
+      "longitude": "28.9784"
+    },
+    "url": "https://muhasebe-web-theta.vercel.app",
+    "telephone": "+905000000000",
+    "priceRange": "$$"
+  };
+
   return (
     <html lang="tr">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className="antialiased bg-slate-50 min-h-screen flex flex-col justify-between">
+        <Header />
+        <main className="flex-grow">{children}</main>
+        <Footer />
       </body>
     </html>
   );
