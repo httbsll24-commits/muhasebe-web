@@ -1,0 +1,56 @@
+@import "tailwindcss";
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+     :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* Klavyeden girilen tüm metinler (Input, Textarea, Select) için uyumlu lacivert stil */
+
+input,
+textarea,
+select {
+    color: #1e3a8a !important;
+    /* Lacivert metin rengi */
+    font-weight: 500;
+}
+
+
+/* Yazı yazılırken ve seçildiğinde belirgin lacivert vurgu */
+
+input:focus,
+textarea:focus,
+select:focus {
+    color: #1e3a8a !important;
+    border-color: #1d4ed8 !important;
+    /* Odaklanınca canlı lacivert/mavi çerçeve */
+    outline: none;
+}
+
+
+/* Yer tutucu (placeholder) silik metin rengi */
+
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8;
+}
