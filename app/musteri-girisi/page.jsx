@@ -1,31 +1,27 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 
 export default function MusteriGirisiPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setErrorMsg('Giriş başarısız: ' + error.message);
-      setLoading(false);
-    } else {
-      // Başarılı girişte doğrudan müşteri dashboard'una yönlendir
+    // Test kullanıcısı doğrulaması
+    if (email === 'hatice@muhasebe.com' && password === '123') {
+      localStorage.setItem('userLoggedIn', 'true');
       router.push('/dashboard');
+    } else {
+      setErrorMsg('E-posta veya şifre hatalı!');
+      setLoading(false);
     }
   };
 
@@ -43,25 +39,25 @@ export default function MusteriGirisiPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs uppercase text-slate-400 mb-1">E-Posta Adresi</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">E-POSTA ADRESİ</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400"
-              placeholder="ornek@firma.com"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+              placeholder="hatice@muhasebe.com"
             />
           </div>
 
           <div>
-            <label className="block text-xs uppercase text-slate-400 mb-1">Şifre</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">ŞİFRE</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-amber-400"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
               placeholder="••••••••"
             />
           </div>
@@ -69,7 +65,7 @@ export default function MusteriGirisiPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-lg text-sm transition disabled:opacity-50"
+            className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-lg text-sm transition-colors"
           >
             {loading ? 'Giriş Yapılıyor...' : 'Portal Girişi Yap'}
           </button>
