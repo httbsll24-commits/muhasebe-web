@@ -1,18 +1,54 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
+import { supabase } from '@/lib/supabase';
+
+interface NotificationItem {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  is_read: boolean;
+  created_at: string;
+}
 
 export default function BildirimlerPage() {
-  const [bildirimler, setBildirimler] = useState([
-    { id: 'NTF-001', baslik: 'KDV1 Beyannamesi Onaylandı', icerik: 'Eylül 2026 dönemine ait KDV1 beyannamesi GİB sistemine iletilmiş ve tahakkuk fişi oluşturulmuştur.', tarih: '03.10.2026 - 10:15', kategori: 'Beyanname', okundu: false },
-    { id: 'NTF-002', baslik: 'Ekim Ayı Vergi Takvimi Hatırlatması', icerik: '26 Ekim 2026 tarihine kadar KDV ve Muhtasar ödemelerinizi yapmayı unutmayınız.', tarih: '01.10.2026 - 09:00', kategori: 'Hatırlatma', okundu: false },
-    { id: 'NTF-003', baslik: 'Yeni Fiş/Fatura Yükleme Onayı', icerik: 'Yüklediğiniz EVR-2026-044 kodlu Banka Dekontu mali müşaviriniz tarafından incelenip işlenmiştir.', tarih: '28.09.2026 - 16:30', kategori: 'Evrak', okundu: true },
-    { id: 'NTF-004', baslik: 'Mevzuat Güncellemesi: E-Defter Takvimi', icerik: 'Resmi Gazete’de yayımlanan son tebliğe göre e-defter berat yükleme süreleri güncellenmiştir.', tarih: '20.09.2026 - 14:00', kategori: 'Mevzuat', okundu: true },
-  ]);
+  const [bildirimler, setBildirimler] = useState<NotificationItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const tumunuOkunduYap = () => {
-    setBildirimler(bildirimler.map(b => ({ ...b, okundu: true })));
+  // Bildirimleri Supabase'den Çek
+  const bildirimleriGetir = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setBildirimler(data as NotificationItem[]);
+    }
+    setLoading(false);
   };
+
+  useEffect(() => {
+    bildirimleriGetir();
+  }, []);
+
+  // Okundu Olarak İşaretle
+  const okunduIsaretle = async (id: string) => {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id);
+
+    if (!error) {
+      setBildirimler((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, is_read: true } : b))
+      );
+    }
+  };
+
+  const okunmamisSayisi = bildirimler.filter((b) => !b.is_read).length;
 
   return (
     <div className="flex bg-slate-950 min-h-screen text-white">
@@ -21,67 +57,63 @@ export default function BildirimlerPage() {
         {/* Başlık */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-slate-800 pb-6">
           <div>
-            <h1 className="text-2xl font-extrabold text-amber-400">🔔 Bildirim Merkezi</h1>
-            <p className="text-slate-400 text-sm mt-1">Mali müşavirinizden gelen sistem bildirimlerini, evrak durumlarını ve vergi hatırlatmalarını takip edin.</p>
+            <h1 className="text-2xl font-extrabold text-amber-400">🔔 Duyuru & Bildirimler</h1>
+            <p className="text-slate-400 text-sm mt-1">Mali müşavirinizden gelen güncel mevzuat duyuruları ve vergi hatırlatmaları.</p>
           </div>
-          <button 
-            onClick={tumunuOkunduYap}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-4 py-2 rounded-lg text-sm transition"
-          >
-            Tümünü Okundu İşaretle
-          </button>
+          {okunmamisSayisi > 0 && (
+            <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-bold px-3 py-1.5 rounded-full self-start md:self-auto">
+              {okunmamisSayisi} Okunmamış Bildirim
+            </span>
+          )}
         </div>
 
-        {/* Özet İstatistik Kartları */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">Toplam Bildirim</span>
-            <div className="text-2xl font-bold text-slate-100 mt-1">{bildirimler.length} Adet</div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">Okunmamış Bildirim</span>
-            <div className="text-2xl font-bold text-amber-400 mt-1">
-              {bildirimler.filter(b => !b.okundu).length} Adet
+        {/* Liste */}
+        <div className="space-y-4 max-w-4xl">
+          {loading ? (
+            <div className="p-8 text-center text-slate-400 bg-slate-900 rounded-xl border border-slate-800">
+              Bildirimler Supabase'den yükleniyor...
             </div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">Son Bildirim Tarihi</span>
-            <div className="text-2xl font-bold text-emerald-400 mt-1">Bugün</div>
-          </div>
-        </div>
-
-        {/* Bildirim Listesi */}
-        <div className="space-y-4">
-          {bildirimler.map((item) => (
-            <div 
-              key={item.id} 
-              className={`p-6 rounded-xl border transition ${
-                item.okundu 
-                  ? 'bg-slate-900/60 border-slate-800/80 text-slate-400' 
-                  : 'bg-slate-900 border-amber-500/40 text-slate-100 shadow-lg shadow-amber-500/5'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-2 gap-4">
-                <div className="flex items-center gap-3">
-                  {!item.okundu && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0 animate-pulse" />
-                  )}
-                  <h3 className={`font-bold text-base ${item.okundu ? 'text-slate-300' : 'text-amber-400'}`}>
-                    {item.baslik}
-                  </h3>
+          ) : bildirimler.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 bg-slate-900 rounded-xl border border-slate-800">
+              Henüz yayınlanmış bir bildirim veya duyuru bulunmuyor.
+            </div>
+          ) : (
+            bildirimler.map((item) => (
+              <div
+                key={item.id}
+                className={`p-5 rounded-xl border transition ${
+                  item.is_read
+                    ? 'bg-slate-900/50 border-slate-800/80 text-slate-400'
+                    : 'bg-slate-900 border-amber-500/30 text-slate-100 shadow-sm'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700">
+                      {item.category || 'Duyuru'}
+                    </span>
+                    <h3 className="font-bold text-base text-slate-100">{item.title}</h3>
+                  </div>
+                  <span className="text-xs text-slate-400 whitespace-nowrap">
+                    {new Date(item.created_at).toLocaleDateString('tr-TR')}
+                  </span>
                 </div>
-                <span className="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-full whitespace-nowrap border border-slate-700">
-                  {item.kategori}
-                </span>
+
+                <p className="text-sm text-slate-300 mt-2 leading-relaxed">{item.content}</p>
+
+                {!item.is_read && (
+                  <div className="mt-4 pt-3 border-t border-slate-800/60 flex justify-end">
+                    <button
+                      onClick={() => okunduIsaretle(item.id)}
+                      className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition"
+                    >
+                      ✓ Okundu Olarak İşaretle
+                    </button>
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed mb-3 pl-5">
-                {item.icerik}
-              </p>
-              <div className="text-[11px] text-slate-400 pl-5">
-                🕒 {item.tarih}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </main>
     </div>
