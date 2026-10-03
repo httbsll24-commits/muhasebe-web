@@ -1,16 +1,47 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function MusteriGirisiPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Giriş simülasyonu -> Doğrudan Müşteri Portalı'na yönlendir
-    router.push('/dashboard');
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      // 1. Supabase Giriş Yap
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      // 2. Kullanıcının Rolünü Çek
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      // 3. Role Göre Yönlendir
+      if (profile?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      setErrorMsg(error.message || 'Giriş yapılırken bir hata oluştu.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,11 +55,17 @@ export default function MusteriGirisiPage() {
           <p className="text-slate-400 text-xs mt-1">Başol Mali Müşavirlik Mükellef Bilgi Sistemi</p>
         </div>
 
+        {errorMsg && (
+          <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs p-3 rounded-lg mb-4 text-center">
+            {errorMsg}
+          </div>
+        )}
+
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">E-Posta veya VKN / TCKN</label>
+            <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">E-Posta Adresi</label>
             <input 
-              type="text" 
+              type="email" 
               required 
               placeholder="ornek@sirket.com" 
               value={email}
@@ -49,15 +86,12 @@ export default function MusteriGirisiPage() {
             />
           </div>
 
-          <div className="flex justify-between items-center text-xs">
-            <label className="flex items-center gap-2 text-slate-400 cursor-pointer">
-              <input type="checkbox" className="accent-amber-500 rounded" /> Beni Hatırla
-            </label>
-            <a href="#" className="text-amber-400 hover:underline">Şifremi Unuttum</a>
-          </div>
-
-          <button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-lg transition text-sm">
-            Portal Portalına Giriş Yap
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-lg transition text-sm disabled:opacity-50"
+          >
+            {loading ? 'Giriş Yapılıyor...' : 'Portal Girişi Yap'}
           </button>
         </form>
       </div>
