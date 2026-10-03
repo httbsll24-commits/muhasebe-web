@@ -1,74 +1,66 @@
 'use client';
-
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Link from 'next/link';
 
 export default function MusteriGirisiPage() {
-  const [vkn, setVkn] = useState('');
+  const router = useRouter();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    alert('Müşteri portalı giriş sistemi simüle edildi.');
+    // Giriş simülasyonu -> Doğrudan Müşteri Portalı'na yönlendir
+    router.push('/dashboard');
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Müşteri Portalı Girişi
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Mevzuat, beyanname ve evrak takibi için giriş yapın
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                TCKN / VKN
-              </label>
-              <input
-                type="text"
-                required
-                value={vkn}
-                onChange={(e) => setVkn(e.target.value)}
-                placeholder="Vergi Kimlik No veya TCKN"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Şifre
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Giriş Yap
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-blue-600 hover:underline">
-              &larr; Ana Sayfaya Dön
-            </Link>
+    <main className="min-h-screen bg-[#0b1329] text-white flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="bg-amber-500 text-slate-950 font-black text-2xl w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3">
+            M
           </div>
+          <h1 className="text-2xl font-extrabold text-white">Müşteri Portalı Girişi</h1>
+          <p className="text-slate-400 text-xs mt-1">Başol Mali Müşavirlik Mükellef Bilgi Sistemi</p>
         </div>
+
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">E-Posta veya VKN / TCKN</label>
+            <input 
+              type="text" 
+              required 
+              placeholder="ornek@sirket.com" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400" 
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">Şifre</label>
+            <input 
+              type="password" 
+              required 
+              placeholder="••••••••" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400" 
+            />
+          </div>
+
+          <div className="flex justify-between items-center text-xs">
+            <label className="flex items-center gap-2 text-slate-400 cursor-pointer">
+              <input type="checkbox" className="accent-amber-500 rounded" /> Beni Hatırla
+            </label>
+            <a href="#" className="text-amber-400 hover:underline">Şifremi Unuttum</a>
+          </div>
+
+          <button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-lg transition text-sm">
+            Portal Portalına Giriş Yap
+          </button>
+        </form>
       </div>
-    </div>
+    </main>
   );
 }
