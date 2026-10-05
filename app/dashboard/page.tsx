@@ -81,19 +81,53 @@ export default function DashboardPage() {
           </a>
 
           <a href="#" style={{ color: '#cbd5e1', padding: '0.75rem 1rem', borderRadius: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', fontWeight: '600' }}>
-            ⚙️️ Hesap Ayarları
+            ⚙️ Hesap Ayarları
           </a>
 
-          {/* YENİ EKLENEN HIZLI GEÇİŞ LİNKLERİ */}
-          <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #1e293b', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: '0.5rem' }}>Yönetim Araçları</span>
-            
-            <Link href="/admin/calc" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '0.75rem 1rem', borderRadius: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', fontWeight: '800' }}>
-              🧮 KDV Hesaplama
+          {/* YÖNETİM VE KDV ARAÇLARI */}
+          <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #1e293b', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', paddingLeft: '0.5rem', letterSpacing: '0.05em' }}>
+              Yönetim Araçları
+            </span>
+
+            <Link
+              href="/admin/calc"
+              style={{
+                backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                color: '#f59e0b',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                padding: '0.65rem 1rem',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                fontSize: '0.85rem',
+                fontWeight: '800'
+              }}
+            >
+              <span>🧮</span>
+              <span>KDV Hesaplama</span>
             </Link>
 
-            <Link href="/admin" style={{ backgroundColor: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '0.75rem 1rem', borderRadius: '0.75rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', fontWeight: '800' }}>
-              ⚙️ Admin Paneli
+            <Link
+              href="/admin"
+              style={{
+                backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                color: '#38bdf8',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                padding: '0.65rem 1rem',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                fontSize: '0.85rem',
+                fontWeight: '800'
+              }}
+            >
+              <span>⚙️</span>
+              <span>Admin Paneli</span>
             </Link>
           </div>
 
