@@ -1,100 +1,238 @@
 'use client';
+
 import { useState } from 'react';
 
-export default function AdminDashboardPage() {
-  const [musteriler, setMusteriler] = useState([
-    { id: 'MST-001', unvan: 'Başol Teknoloji & Yazılım Ltd. Şti.', vkn: '1234567890', kdvDurum: 'Onaylandı', muhtasarDurum: 'Hazırlanıyor', sonEvrak: '02.10.2026' },
-    { id: 'MST-002', unvan: 'Yılmaz Lojistik San. Tic. A.Ş.', vkn: '9876543210', kdvDurum: 'Beklemede', muhtasarDurum: 'Beklemede', sonEvrak: '29.09.2026' },
-    { id: 'MST-003', unvan: 'Kaya Mimarlık Mühendislik', vkn: '5544332211', kdvDurum: 'Onaylandı', muhtasarDurum: 'Onaylandı', sonEvrak: '28.09.2026' },
+export default function AdminPage() {
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Duyuru');
+  const [content, setContent] = useState('');
+  const [posts, setPosts] = useState([
+    { id: 1, title: '2026/3. Dönem Geçici Vergi Hatırlatması', category: 'Duyuru', date: '05.10.2026' },
+    { id: 2, title: 'Yeni E-Fatura Düzenlemeleri Rehberi', category: 'Blog', date: '01.10.2026' }
   ]);
 
+  const handleCreatePost = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !content) return;
+
+    const newPost = {
+      id: Date.now(),
+      title,
+      category,
+      date: new Date().toLocaleDateString('tr-TR')
+    };
+
+    setPosts([newPost, ...posts]);
+    setTitle('');
+    setContent('');
+    alert('Post/Duyuru başarıyla yayınlandı!');
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Üst Yönetim Bandı */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-slate-800 pb-6">
+    <div className="min-h-screen bg-slate-950 text-white p-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="flex justify-between items-center border-b border-slate-800 pb-4">
           <div>
-            <span className="text-xs text-amber-400 font-bold tracking-widest uppercase">MALI MÜŞAVİR YÖNETİM PANELİ</span>
-            <h1 className="text-2xl font-extrabold text-white mt-1">👨‍💻 SMMM Yönetim Kontrol Merkezi</h1>
+            <h1 className="text-2xl font-bold text-amber-400">Yönetim (Admin) Paneli</h1>
+            <p className="text-xs text-slate-400">Mali Müşavir İçerik & Duyuru Yönetimi</p>
           </div>
-          <div className="flex gap-3">
-            <button className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition">
-              + Yeni Müşellef / Müşteri Ekle
-            </button>
-            <button className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-4 py-2 rounded-lg text-sm transition">
-              📢 Toplu Duyuru / SMS Gönder
-            </button>
-          </div>
+          <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-xs font-semibold">
+            Yönetici Modu
+          </span>
         </div>
 
-        {/* Özet Metrik Kartları */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">Aktif Müşteri Sayısı</span>
-            <div className="text-2xl font-bold text-amber-400 mt-1">24 Mükellef</div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">Bekleyen Beyannameler</span>
-            <div className="text-2xl font-bold text-rose-400 mt-1">8 Adet</div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">İncelenecek Evraklar</span>
-            <div className="text-2xl font-bold text-slate-100 mt-1">12 Adet Fiş/Fatura</div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-            <span className="text-xs text-slate-400 uppercase">Bu Ay Onaylanan</span>
-            <div className="text-2xl font-bold text-emerald-400 mt-1">16 Beyanname</div>
-          </div>
+        {/* Post / Duyuru Ekleme Formu */}
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
+          <h2 className="text-lg font-semibold text-white">Yeni Post / Duyuru Yayınla</h2>
+          <form onSubmit={handleCreatePost} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-xs text-slate-400 mb-1">Başlık</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Örn: 2026 KDV Beyanname Süreleri"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Kategori</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                >
+                  <option value="Duyuru">Duyuru</option>
+                  <option value="Blog">Blog Yazısı</option>
+                  <option value="Mevzuat">Mevzuat Güncellemesi</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">İçerik Detayı</label>
+              <textarea
+                rows={4}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Yayınlamak istediğiniz duyuru veya blog içeriğini giriniz..."
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition-colors"
+            >
+              Yayınla
+            </button>
+          </form>
         </div>
 
-        {/* Müşteri Yönetim Tablosu */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-slate-800 flex justify-between items-center">
-            <h2 className="font-bold text-slate-100">📋 Mükellef Beyanname & Evrak Takip Listesi</h2>
-            <input type="text" placeholder="Müşteri ara (Unvan veya VKN)..." className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400 w-64" />
+        {/* Yayınlanan Postlar Listesi */}
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
+          <h2 className="text-lg font-semibold text-white">Yayınlanan İçerikler</h2>
+          <div className="space-y-3">
+            {posts.map((post) => (
+              <div key={post.id} className="p-4 bg-slate-800/50 rounded-lg flex justify-between items-center border border-slate-700/50">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">{post.category}</span>
+                    <h3 className="font-semibold text-sm">{post.title}</h3>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">Yayın Tarihi: {post.date}</p>
+                </div>
+                <button
+                  onClick={() => setPosts(posts.filter((p) => p.id !== post.id))}
+                  className="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-3 py-1.5 rounded transition-colors"
+                >
+                  Sil
+                </button>
+              </div>
+            ))}
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-800/60 text-xs uppercase text-slate-400 border-b border-slate-800">
-                <tr>
-                  <th className="p-4">Kodu</th>
-                  <th className="p-4">Mükellef Unvanı</th>
-                  <th className="p-4">VKN / TCKN</th>
-                  <th className="p-4">KDV Beyanname</th>
-                  <th className="p-4">Muhtasar</th>
-                  <th className="p-4">Son Evrak</th>
-                  <th className="p-4 text-right">Yönetim</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {musteriler.map((m) => (
-                  <tr key={m.id} className="hover:bg-slate-800/40 transition">
-                    <td className="p-4 font-mono text-amber-400 font-semibold">{m.id}</td>
-                    <td className="p-4 font-medium text-slate-100">{m.unvan}</td>
-                    <td className="p-4 text-slate-400">{m.vkn}</td>
-                    <td className="p-4">
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${m.kdvDurum === 'Onaylandı' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                        {m.kdvDurum}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${m.muhtasarDurum === 'Onaylandı' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
-                        {m.muhtasarDurum}
-                      </span>
-                    </td>
-                    <td className="p-4 text-slate-400 text-xs">{m.sonEvrak}</td>
-                    <td className="p-4 text-right flex justify-end gap-2">
-                      <button className="text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-3 py-1.5 rounded border border-amber-500/30 transition">
-                        Beyanname Yükle
-                      </button>
-                      <button className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded transition">
-                        Detay
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        </div>
+      </div>
+    </div>
+  );
+}'use client';
+
+import { useState } from 'react';
+
+export default function AdminPage() {
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('Duyuru');
+  const [content, setContent] = useState('');
+  const [posts, setPosts] = useState([
+    { id: 1, title: '2026/3. Dönem Geçici Vergi Hatırlatması', category: 'Duyuru', date: '05.10.2026' },
+    { id: 2, title: 'Yeni E-Fatura Düzenlemeleri Rehberi', category: 'Blog', date: '01.10.2026' }
+  ]);
+
+  const handleCreatePost = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !content) return;
+
+    const newPost = {
+      id: Date.now(),
+      title,
+      category,
+      date: new Date().toLocaleDateString('tr-TR')
+    };
+
+    setPosts([newPost, ...posts]);
+    setTitle('');
+    setContent('');
+    alert('Post/Duyuru başarıyla yayınlandı!');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white p-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-amber-400">Yönetim (Admin) Paneli</h1>
+            <p className="text-xs text-slate-400">Mali Müşavir İçerik & Duyuru Yönetimi</p>
+          </div>
+          <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-xs font-semibold">
+            Yönetici Modu
+          </span>
+        </div>
+
+        {/* Post / Duyuru Ekleme Formu */}
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
+          <h2 className="text-lg font-semibold text-white">Yeni Post / Duyuru Yayınla</h2>
+          <form onSubmit={handleCreatePost} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-xs text-slate-400 mb-1">Başlık</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Örn: 2026 KDV Beyanname Süreleri"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Kategori</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                >
+                  <option value="Duyuru">Duyuru</option>
+                  <option value="Blog">Blog Yazısı</option>
+                  <option value="Mevzuat">Mevzuat Güncellemesi</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-400 mb-1">İçerik Detayı</label>
+              <textarea
+                rows={4}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Yayınlamak istediğiniz duyuru veya blog içeriğini giriniz..."
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition-colors"
+            >
+              Yayınla
+            </button>
+          </form>
+        </div>
+
+        {/* Yayınlanan Postlar Listesi */}
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
+          <h2 className="text-lg font-semibold text-white">Yayınlanan İçerikler</h2>
+          <div className="space-y-3">
+            {posts.map((post) => (
+              <div key={post.id} className="p-4 bg-slate-800/50 rounded-lg flex justify-between items-center border border-slate-700/50">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">{post.category}</span>
+                    <h3 className="font-semibold text-sm">{post.title}</h3>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">Yayın Tarihi: {post.date}</p>
+                </div>
+                <button
+                  onClick={() => setPosts(posts.filter((p) => p.id !== post.id))}
+                  className="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-3 py-1.5 rounded transition-colors"
+                >
+                  Sil
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
