@@ -1,29 +1,21 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Başol Mali Müşavirlik | SMMM & Finansal Danışmanlık",
-  description: "Profesyonel Mali Müşavirlik, Muhasebe, Vergi Danışmanlığı ve E-Dönüşüm Hizmetleri",
-  keywords: ["Mali Müşavir", "SMMM", "Muhasebe Bürosu", "Vergi Danışmanlığı", "E-Fatura"],
+  title: 'Başol Mali Müşavirlik | SMMM ve Muhasebe Hizmetleri',
+  description: 'Profesyonel mali müşavirlik, beyanname takip ve muhasebe hizmetleri.',
   verification: {
-    google: "google37117671b7d32e8f",
+    google: 'HWmULbSRdGY84qJO9mo9LIZ9JS8i_WP7g2goHHrukrM',
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="tr">
-      <body>
-        <Header />
-        {children}
-        <Footer />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
