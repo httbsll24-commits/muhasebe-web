@@ -1,120 +1,209 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
-export default function AdminPage() {
+interface Post {
+  id: string;
+  title: string;
+  category: string;
+  content: string;
+}
+
+export default function AdminPostsPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Duyuru');
   const [content, setContent] = useState('');
-  const [posts, setPosts] = useState([
-    { id: 1, title: '2026/3. Dönem Geçici Vergi Hatırlatması', category: 'Duyuru', date: '05.10.2026' },
-    { id: 2, title: 'Yeni E-Fatura Düzenlemeleri Rehberi', category: 'Blog', date: '01.10.2026' }
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleCreatePost = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch('/api/news');
+      if (res.ok) {
+        const data = await res.json();
+        setPosts(data);
+      }
+    } catch (error) {
+      console.error('Postlar çekilemedi:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !content) return;
+    setLoading(true);
+    setMessage('');
 
-    const newPost = {
-      id: Date.now(),
-      title,
-      category,
-      date: new Date().toLocaleDateString('tr-TR')
-    };
+    try {
+      const res = await fetch('/api/news', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, category, content }),
+      });
 
-    setPosts([newPost, ...posts]);
-    setTitle('');
-    setContent('');
-    alert('Post/Duyuru başarıyla yayınlandı!');
+      if (res.ok) {
+        setMessage('✅ İçerik başarıyla yayınlandı!');
+        setTitle('');
+        setContent('');
+        fetchPosts();
+      } else {
+        setMessage('❌ Bir hata oluştu.');
+      }
+    } catch (err) {
+      setMessage('❌ Bağlantı hatası.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Bu içeriği silmek istediğinize emin misiniz?')) return;
+
+    try {
+      const res = await fetch(`/api/news?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setPosts(posts.filter((p) => p.id !== id));
+      }
+    } catch (err) {
+      alert('Silinemedi.');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+    <div style={{ minHeight: '100vh', backgroundColor: '#0b1329', color: '#f8fafc', padding: '2.5rem 1.5rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        
+        {/* GEZİNTİ VE BAŞLIK */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
           <div>
-            <h1 className="text-2xl font-bold text-amber-400">Yönetim (Admin) Paneli</h1>
-            <p className="text-xs text-slate-400">Mali Müşavir İçerik & Duyuru Yönetimi</p>
+            <h1 style={{ fontSize: '2rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>
+              📢 Haber & Duyuru Merkezi
+            </h1>
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '0.25rem' }}>
+              Müşterilerinize görünecek mevzuat, vergi duyuruları ve haber içerikleri.
+            </p>
           </div>
-          <span className="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-xs font-semibold">
-            Yönetici Modu
-          </span>
+          <Link href="/admin" style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9', padding: '0.6rem 1.2rem', borderRadius: '0.75rem', textDecoration: 'none', fontSize: '0.875rem', fontWeight: '700' }}>
+            ← Panele Dön
+          </Link>
         </div>
 
-        {/* Post / Duyuru Ekleme Formu */}
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
-          <h2 className="text-lg font-semibold text-white">Yeni Post / Duyuru Yayınla</h2>
-          <form onSubmit={handleCreatePost} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-xs text-slate-400 mb-1">Başlık</label>
+        {message && (
+          <div style={{ padding: '1rem', marginBottom: '1.5rem', borderRadius: '0.75rem', backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', fontSize: '0.9rem', fontWeight: '600' }}>
+            {message}
+          </div>
+        )}
+
+        {/* EKLENME FORMU */}
+        <div style={{ backgroundColor: '#111c38', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '1.25rem', padding: '2rem', marginBottom: '2.5rem', boxShadow: '0 20px 30px -10px rgba(0,0,0,0.5)' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#f59e0b', marginTop: 0, marginBottom: '1.5rem' }}>
+            ✍️ Yeni İçerik Paylaş
+          </h2>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 220px', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Başlık
+                </label>
                 <input
                   type="text"
+                  required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Örn: 2026 KDV Beyanname Süreleri"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
-                  required
+                  placeholder="Örn: 2026/3. Dönem Geçici Vergi Hatırlatması"
+                  style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '0.75rem', padding: '0.85rem 1rem', color: '#ffffff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
                 />
               </div>
+
               <div>
-                <label className="block text-xs text-slate-400 mb-1">Kategori</label>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Kategori
+                </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+                  style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '0.75rem', padding: '0.85rem 1rem', color: '#ffffff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
                 >
-                  <option value="Duyuru">Duyuru</option>
-                  <option value="Blog">Blog Yazısı</option>
-                  <option value="Mevzuat">Mevzuat Güncellemesi</option>
+                  <option value="Duyuru">📌 Duyuru</option>
+                  <option value="Haber">📰 Mali Haber</option>
+                  <option value="Mevzuat">⚖️ Vergi Mevzuatı</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs text-slate-400 mb-1">İçerik Detayı</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                İçerik Metni
+              </label>
               <textarea
-                rows={4}
+                required
+                rows={5}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Yayınlamak istediğiniz duyuru veya blog içeriğini giriniz..."
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
-                required
+                placeholder="Yayınlanmasını istediğiniz detayları buraya ekleyin..."
+                style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '0.75rem', padding: '0.85rem 1rem', color: '#ffffff', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
 
             <button
               type="submit"
-              className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-sm transition-colors"
+              disabled={loading}
+              style={{
+                backgroundColor: '#f59e0b',
+                color: '#0b1329',
+                border: 'none',
+                padding: '1rem',
+                borderRadius: '0.75rem',
+                fontWeight: '900',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                marginTop: '0.5rem',
+                boxShadow: '0 10px 20px -5px rgba(245, 158, 11, 0.4)'
+              }}
             >
-              Yayınla
+              {loading ? 'Yayınlanıyor...' : 'Sitede Anında Yayınla'}
             </button>
           </form>
         </div>
 
-        {/* Yayınlanan Postlar Listesi */}
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4">
-          <h2 className="text-lg font-semibold text-white">Yayınlanan İçerikler</h2>
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <div key={post.id} className="p-4 bg-slate-800/50 rounded-lg flex justify-between items-center border border-slate-700/50">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">{post.category}</span>
-                    <h3 className="font-semibold text-sm">{post.title}</h3>
+        {/* LİSTELEME */}
+        <div style={{ backgroundColor: '#111c38', border: '1px solid #1e293b', borderRadius: '1.25rem', padding: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#ffffff', marginTop: 0, marginBottom: '1.25rem' }}>
+            📋 Yayındaki Tüm İçerikler ({posts.length})
+          </h2>
+
+          {posts.length === 0 ? (
+            <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Henüz kayıtlı içerik bulunmuyor.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {posts.map((post) => (
+                <div key={post.id} style={{ backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.25rem 0.6rem', borderRadius: '0.35rem', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                      {post.category}
+                    </span>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#f8fafc', margin: '0.6rem 0 0.3rem 0' }}>{post.title}</h3>
+                    <p style={{ fontSize: '0.9rem', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>{post.content}</p>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">Yayın Tarihi: {post.date}</p>
+
+                  <button
+                    onClick={() => handleDelete(post.id)}
+                    style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.5rem 1rem', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700' }}
+                  >
+                    Sil
+                  </button>
                 </div>
-                <button
-                  onClick={() => setPosts(posts.filter((p) => p.id !== post.id))}
-                  className="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 px-3 py-1.5 rounded transition-colors"
-                >
-                  Sil
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
+
       </div>
     </div>
   );
