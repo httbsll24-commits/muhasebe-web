@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function BlogPage() {
   const posts = [
@@ -34,8 +36,13 @@ export default function BlogPage() {
   ];
 
   return (
-    <div style={{ backgroundColor: '#0b1329', color: '#f8fafc', minHeight: '100vh', padding: '2.5rem 1rem', fontFamily: 'sans-serif' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+    <div style={{ backgroundColor: '#0b1329', color: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontFamily: 'sans-serif' }}>
+      
+      {/* Üst Gezinti Menüsü (Navbar) */}
+      <Navbar />
+
+      {/* Blog İçeriği */}
+      <div style={{ maxWidth: '1100px', margin: '0 auto', width: '100%', padding: '3rem 1rem flexGrow: 1' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', borderBottom: '1px solid #1e293b', paddingBottom: '1.5rem' }}>
@@ -66,7 +73,7 @@ export default function BlogPage() {
         </div>
 
         {/* Blog Kartları Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.75rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.75rem', marginBottom: '3rem' }}>
           {posts.map((post) => (
             <article
               key={post.id}
@@ -77,7 +84,6 @@ export default function BlogPage() {
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                transition: 'transform 0.2s, border-color 0.2s',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
               }}
             >
@@ -132,6 +138,10 @@ export default function BlogPage() {
         </div>
 
       </div>
+
+      {/* Alt Kurumsal Bilgi (Footer) */}
+      <Footer />
+
     </div>
   );
 }

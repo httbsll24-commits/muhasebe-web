@@ -1,266 +1,119 @@
 'use client';
-import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
-import { supabase } from '@/lib/supabase';
+
+import { useState } from 'react';
+import Link from 'next/link';
 
 interface DocumentItem {
-  id: string;
-  file_name: string;
-  file_type: string;
-  file_size: string;
-  file_url: string;
-  note?: string;
+  id: number;
+  docTitle: string;
+  docCategory: string;
+  uploadDate: string;
+  fileSize: string;
   status: string;
-  created_at: string;
 }
 
-export default function EvraklarPage() {
-  const [tab, setTab] = useState<'yukle' | 'list' | 'arsiv'>('yukle');
-  const [evraklar, setEvraklar] = useState<DocumentItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+export default function EvraklarDashboardPage() {
+  const [docs, setDocs] = useState<DocumentItem[]>([
+    { id: 1, docTitle: '2026 Vergi Levhası.pdf', docCategory: 'Vergi Levhası', uploadDate: '10.10.2026', fileSize: '1.2 MB', status: 'Onaylandı' },
+    { id: 2, docTitle: 'Eylül 2026 KDV Beyannamesi Tahakkuk.pdf', docCategory: 'Beyanname & Tahakkuk', uploadDate: '15.10.2026', fileSize: '850 KB', status: 'İncelendi' },
+    { id: 3, docTitle: 'Ticaret Sicil Gazetesi Örneği.pdf', docCategory: 'Sicil & Kuruluş', uploadDate: '01.09.2026', fileSize: '2.4 MB', status: 'Onaylandı' },
+  ]);
 
-  // Form State
-  const [fileType, setFileType] = useState<string>('Gider Fişi / Alış Faturası');
-  const [fileName, setFileName] = useState<string>('');
-  const [fileUrl, setFileUrl] = useState<string>('');
-  const [note, setNote] = useState<string>('');
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [docTitle, setDocTitle] = useState('');
+  const [docCategory, setDocCategory] = useState('Vergi Levhası');
 
-  // Evrakları Çek
-  const evraklariGetir = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('documents')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setEvraklar(data as DocumentItem[]);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    evraklariGetir();
-  }, []);
-
-  // Yeni Evrak Kaydet
-  const handleEvrakYukle = async (e: React.FormEvent) => {
+  const handleUpload = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fileName || !fileUrl) {
-      setMessage({ text: 'Lütfen dosya adı ve dosya URL bilgilerini giriniz.', type: 'error' });
-      return;
-    }
+    if (!docTitle) return;
 
-    setUploading(true);
-    setMessage(null);
+    const newDoc: DocumentItem = {
+      id: Date.now(),
+      docTitle,
+      docCategory,
+      uploadDate: new Date().toLocaleDateString('tr-TR'),
+      fileSize: '1.5 MB',
+      status: 'Yüklendi',
+    };
 
-    const { error } = await supabase.from('documents').insert([
-      {
-        file_name: fileName,
-        file_type: fileType,
-        file_size: '1.5 MB',
-        file_url: fileUrl,
-        note: note,
-        status: 'Beklemede',
-      },
-    ]);
-
-    if (error) {
-      setMessage({ text: 'Evrak kaydedilirken hata oluştu: ' + error.message, type: 'error' });
-    } else {
-      setMessage({ text: 'Evrak başarıyla kaydedildi!', type: 'success' });
-      setFileName('');
-      setFileUrl('');
-      setNote('');
-      evraklariGetir();
-      setTab('list');
-    }
-    setUploading(false);
+    setDocs([newDoc, ...docs]);
+    setDocTitle('');
+    alert('Evrak başarıyla sisteminize eklendi ve SMMM onayına gönderildi!');
   };
 
   return (
-    <div className="flex bg-slate-950 min-h-screen text-white">
-      <Sidebar />
-      <main className="flex-1 p-6 md:p-8">
-        {/* Başlık */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-slate-800 pb-6">
+    <div style={{ maxWidth: '1000px', margin: '0 auto', color: '#fff' }}>
+      
+      {/* Üst Başlık */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid #1e293b', paddingBottom: '1rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#f59e0b', margin: 0 }}>📁 Dijital Evrak & Belgelerim</h1>
+          <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '0.25rem' }}>Müşavirliğinizle paylaşılan veya sistemden indirebileceğiniz resmi evraklar.</p>
+        </div>
+        <Link href="/dashboard" style={{ backgroundColor: '#1e293b', color: '#f59e0b', border: '1px solid #334155', padding: '0.6rem 1.2rem', borderRadius: '0.6rem', fontWeight: '700', textDecoration: 'none', fontSize: '0.85rem' }}>
+          ← Portala Dön
+        </Link>
+      </div>
+
+      {/* Müşkellef Evrak Yükleme Alanı */}
+      <div style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.5rem', marginBottom: '2rem' }}>
+        <h2 style={{ fontSize: '1.1rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1rem' }}>📤 Yeni Evrak / Fiş Yükle</h2>
+        <form onSubmit={handleUpload} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '1rem' }}>
           <div>
-            <h1 className="text-2xl font-extrabold text-amber-400">📁 Evrak & Belge Yönetimi</h1>
-            <p className="text-slate-400 text-sm mt-1">Muhasebecinize iletmek istediğiniz fiş, fatura ve dekontları yükleyin.</p>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.3rem' }}>EVRAK / DOKÜMAN ADI</label>
+            <input
+              type="text"
+              placeholder="Örn: Ekim_Gider_Faturasi.pdf"
+              value={docTitle}
+              onChange={(e) => setDocTitle(e.target.value)}
+              required
+              style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '600' }}
+            />
           </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.3rem' }}>KATEGORİ</label>
+            <select
+              value={docCategory}
+              onChange={(e) => setDocCategory(e.target.value)}
+              style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700' }}
+            >
+              <option value="Vergi Levhası">📜 Vergi Levhası</option>
+              <option value="Beyanname & Tahakkuk">📄 Beyanname / Tahakkuk</option>
+              <option value="Sicil & Kuruluş">🏢 Sicil & Sözleşme</option>
+              <option value="Gider Fişi / Fatura">🧾 Gider Fişi / Fatura</option>
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+            <button type="submit" style={{ width: '100%', backgroundColor: '#f59e0b', color: '#0b1329', fontWeight: '900', padding: '0.75rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '0.85rem' }}>
+              ⬆️ Yükle
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Evrak Listesi */}
+      <div style={{ backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.5rem' }}>
+        <h2 style={{ fontSize: '1.1rem', color: '#fff', fontWeight: '800', marginBottom: '1rem' }}>📑 Sistemdeki Belgeler ({docs.length})</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {docs.map((item) => (
+            <div key={item.id} style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', padding: '1rem 1.25rem', borderRadius: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: '800' }}>{item.docCategory}</div>
+                <div style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', marginTop: '0.2rem' }}>{item.docTitle}</div>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.2rem' }}>Tarih: {item.uploadDate} • Boyut: {item.fileSize}</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.3rem 0.6rem', borderRadius: '0.4rem', fontSize: '0.75rem', fontWeight: '800' }}>
+                  {item.status}
+                </span>
+                <button onClick={() => alert(`${item.docTitle} indiriliyor...`)} style={{ backgroundColor: '#1e293b', color: '#3b82f6', border: '1px solid #334155', padding: '0.4rem 0.8rem', borderRadius: '0.4rem', fontWeight: '700', fontSize: '0.75rem', cursor: 'pointer' }}>
+                  ⬇️ İndir
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Sekmeler */}
-        <div className="flex space-x-2 border-b border-slate-800 mb-6">
-          <button
-            onClick={() => setTab('yukle')}
-            className={`pb-3 px-4 font-semibold text-sm transition border-b-2 ${
-              tab === 'yukle' ? 'border-amber-400 text-amber-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            📤 Yeni Evrak Yükle
-          </button>
-          <button
-            onClick={() => setTab('list')}
-            className={`pb-3 px-4 font-semibold text-sm transition border-b-2 ${
-              tab === 'list' ? 'border-amber-400 text-amber-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            📑 Evraklarım ({evraklar.length})
-          </button>
-          <button
-            onClick={() => setTab('arsiv')}
-            className={`pb-3 px-4 font-semibold text-sm transition border-b-2 ${
-              tab === 'arsiv' ? 'border-amber-400 text-amber-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            📦 Evrak Arşivi
-          </button>
-        </div>
-
-        {/* 1. SEKMELER: YENİ EVRAK YÜKLE */}
-        {tab === 'yukle' && (
-          <div className="max-w-2xl bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-sm">
-            <h2 className="text-lg font-bold text-slate-100 mb-4">Evrak Detayları</h2>
-
-            {message && (
-              <div
-                className={`p-3 rounded-lg text-xs mb-4 text-center border ${
-                  message.type === 'success'
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                    : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                }`}
-              >
-                {message.text}
-              </div>
-            )}
-
-            <form onSubmit={handleEvrakYukle} className="space-y-5">
-              <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">Belge Türü</label>
-                <select
-                  value={fileType}
-                  onChange={(e) => setFileType(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400"
-                >
-                  <option>Gider Fişi / Alış Faturası</option>
-                  <option>Banka Dekontu</option>
-                  <option>SGK / Personel Evrağı</option>
-                  <option>Sözleşme / Resmi Belge</option>
-                  <option>Diğer Evraklar</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">Dosya Adı</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Örn: Eylul_Akaryakit_Fisi.pdf"
-                  value={fileName}
-                  onChange={(e) => setFileName(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">Dosya Bağlantısı (URL / Supabase Storage)</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="https://..."
-                  value={fileUrl}
-                  onChange={(e) => setFileUrl(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">Açıklama / Not (Opsiyonel)</label>
-                <textarea
-                  rows={3}
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Mali müşavirinize iletmek istediğiniz not..."
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400"
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                disabled={uploading}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 rounded-lg transition text-sm disabled:opacity-50"
-              >
-                {uploading ? 'Kaydediliyor...' : 'Evrağı Gönder'}
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* 2. SEKMELER: EVRAKLARIM LISTESI */}
-        {tab === 'list' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-            {loading ? (
-              <div className="p-8 text-center text-slate-400">Evraklar yükleniyor...</div>
-            ) : evraklar.length === 0 ? (
-              <div className="p-8 text-center text-slate-400">Kayıtlı evrak bulunmuyor.</div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-300">
-                  <thead className="bg-slate-800/60 text-xs uppercase text-slate-400 border-b border-slate-800">
-                    <tr>
-                      <th className="p-4">Dosya Adı</th>
-                      <th className="p-4">Belge Türü</th>
-                      <th className="p-4">Yükleme Tarihi</th>
-                      <th className="p-4">Durum</th>
-                      <th className="p-4 text-right">İşlem</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800">
-                    {evraklar.map((evrak) => (
-                      <tr key={evrak.id} className="hover:bg-slate-800/40 transition">
-                        <td className="p-4 font-medium text-slate-100">{evrak.file_name}</td>
-                        <td className="p-4 text-slate-400">{evrak.file_type}</td>
-                        <td className="p-4 text-slate-300">{new Date(evrak.created_at).toLocaleDateString('tr-TR')}</td>
-                        <td className="p-4">
-                          <span
-                            className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
-                              evrak.status === 'İşlendi'
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            }`}
-                          >
-                            {evrak.status}
-                          </span>
-                        </td>
-                        <td className="p-4 text-right">
-                          <a
-                            href={evrak.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded transition inline-block"
-                          >
-                            Görüntüle
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 3. SEKMELER: ARŞİV */}
-        {tab === 'arsiv' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center text-slate-400">
-            📦 Arşivlenmiş evraklar burada listelenir.
-          </div>
-        )}
-      </main>
     </div>
   );
 }

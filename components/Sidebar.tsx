@@ -19,7 +19,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside style={{ width: '280px', backgroundColor: '#070d1e', borderRight: '1px solid #1e293b', minHeight: '100vh', padding: '1.5rem 1rem', color: '#f8fafc', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+    <aside style={{ width: '280px', backgroundColor: '#070d1e', borderRight: '1px solid #1e293b', minHeight: '100vh', padding: '1.5rem 1rem', color: '#f8fafc', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexShrink: 0 }}>
       <div>
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem', paddingLeft: '0.5rem' }}>
@@ -69,7 +69,7 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Yönetim Araçları */}
+      {/* Alt Yönetim Bağlantıları */}
       <div style={{ marginTop: '2rem', borderTop: '1px solid #1e293b', paddingTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
         <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px', marginBottom: '0.25rem', paddingLeft: '0.5rem' }}>
           YÖNETİM ARAÇLARI
