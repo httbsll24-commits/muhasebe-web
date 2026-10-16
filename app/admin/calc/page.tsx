@@ -9,7 +9,7 @@ export default function CalcPage() {
   // 1. KDV Hesaplama State
   const [kdvTutar, setKdvTutar] = useState(1000);
   const [kdvOran, setKdvOran] = useState(20);
-  const [kdvTur, setKdvTur] = useState('haric'); // 'haric' veya 'dahil'
+  const [kdvTur, setKdvTur] = useState('haric');
 
   const kdvMatrah = kdvTur === 'haric' ? kdvTutar : kdvTutar / (1 + kdvOran / 100);
   const kdvTutarHesap = kdvTur === 'haric' ? kdvTutar * (kdvOran / 100) : kdvTutar - kdvMatrah;
@@ -17,7 +17,7 @@ export default function CalcPage() {
 
   // 2. Stopaj Hesaplama State
   const [stopajTutar, setStopajTutar] = useState(10000);
-  const [stopajOran, setStopajOran] = useState(20); // %20 Kira / SMM
+  const [stopajOran, setStopajOran] = useState(20);
   const stopajKesinti = stopajTutar * (stopajOran / 100);
   const stopajNet = stopajTutar - stopajKesinti;
 
@@ -26,7 +26,7 @@ export default function CalcPage() {
   const sgkIsci = brutMaas * 0.14;
   const issizlikIsci = brutMaas * 0.01;
   const gelirVergisiMatrah = brutMaas - (sgkIsci + issizlikIsci);
-  const tahminiNetMaas = gelirVergisiMatrah * 0.85; // Ortalama %15 vergi dilimi
+  const tahminiNetMaas = gelirVergisiMatrah * 0.85;
 
   const tools = [
     { id: 'kdv', no: '01', title: 'KDV Hesaplama', desc: 'Matrahtan KDV ekleyin veya KDV dahil tutardan matrahı ayırın (%1, %10, %20).' },
@@ -42,10 +42,10 @@ export default function CalcPage() {
 
   return (
     <div style={{ backgroundColor: '#0b1329', color: '#f8fafc', minHeight: '100vh', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', spaceY: '2rem' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid #1e293b', pb: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid #1e293b', paddingBottom: '1rem' }}>
           <div>
             <h1 style={{ fontSize: '2rem', fontWeight: '900', color: '#fff', margin: 0 }}>🧮 Tüm Hesaplamalar</h1>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '0.25rem' }}>Mali müşavirlik, vergi, maaş ve finansal hesaplama araçları merkezi.</p>
@@ -81,7 +81,7 @@ export default function CalcPage() {
           ))}
         </div>
 
-        {/* AKTİF HESAPLAYICI PANELDİ */}
+        {/* AKTİF HESAPLAYICI PANELİ */}
         <div style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', borderRadius: '1rem', padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
           
           {/* 1. KDV HESAPLAMA */}
@@ -187,7 +187,7 @@ export default function CalcPage() {
             <div>
               <h2 style={{ fontSize: '1.4rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1.5rem' }}>💼 Brütten Nete Maaş Hesaplayıcı</h2>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>MONTHLY BRÜT ÜCRET (TL)</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>AYLIK BRÜT ÜCRET (TL)</label>
                 <input
                   type="number"
                   value={brutMaas}
@@ -196,16 +196,16 @@ export default function CalcPage() {
                 />
               </div>
 
-              <div style={{ backgroundColor: '#070d1e', padding: '1.5rem', borderRadius: '0.75rem', spaceY: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', pb: '0.5rem' }}>
+              <div style={{ backgroundColor: '#070d1e', padding: '1.5rem', borderRadius: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
                   <span>SGK İşçi Payı (%14):</span>
                   <span style={{ fontWeight: '700', color: '#ef4444' }}>-{sgkIsci.toLocaleString('tr-TR')} ₺</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', pb: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
                   <span>İşsizlik Sigortası İşçi (%1):</span>
                   <span style={{ fontWeight: '700', color: '#ef4444' }}>-{issizlikIsci.toLocaleString('tr-TR')} ₺</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', pt: '0.5rem', fontSize: '1.2rem', fontWeight: '900' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.5rem', fontSize: '1.2rem', fontWeight: '900' }}>
                   <span style={{ color: '#10b981' }}>Tahmini Ele Geçen Net Maaş:</span>
                   <span style={{ color: '#10b981' }}>{tahminiNetMaas.toLocaleString('tr-TR')} ₺</span>
                 </div>
