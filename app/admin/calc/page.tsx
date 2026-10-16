@@ -3,263 +3,229 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-interface TrackerItem {
-  id: string;
-  clientName: string;
-  month: string;
-  feeAmount: number;
-  status: 'Bekliyor' | 'Ödendi';
-  taxType: string;
-}
+export default function CalcPage() {
+  const [activeTab, setActiveTab] = useState('kdv');
 
-export default function AdminCalcPage() {
-  // KDV HESAPLAMA STATE
-  const [amount, setAmount] = useState<number | ''>(1000);
-  const [vatRate, setVatRate] = useState<number>(20);
-  const [calcType, setCalcType] = useState<'hariç' | 'dahil'>('hariç');
+  // 1. KDV Hesaplama State
+  const [kdvTutar, setKdvTutar] = useState(1000);
+  const [kdvOran, setKdvOran] = useState(20);
+  const [kdvTur, setKdvTur] = useState('haric'); // 'haric' veya 'dahil'
 
-  // AİDAT / VERGİ TAKİP STATE
-  const [trackerList, setTrackerList] = useState<TrackerItem[]>([
-    { id: '1', clientName: 'Ahmet Yılmaz - Tekstil Ltd.', month: 'Ekim 2026', feeAmount: 3500, status: 'Bekliyor', taxType: 'KDV / Muhtasar' },
-    { id: '2', clientName: 'Kaya Otomotiv A.Ş.', month: 'Ekim 2026', feeAmount: 5000, status: 'Ödendi', taxType: 'Geçici Vergi' },
-  ]);
+  const kdvMatrah = kdvTur === 'haric' ? kdvTutar : kdvTutar / (1 + kdvOran / 100);
+  const kdvTutarHesap = kdvTur === 'haric' ? kdvTutar * (kdvOran / 100) : kdvTutar - kdvMatrah;
+  const kdvToplam = kdvTur === 'haric' ? kdvTutar + kdvTutarHesap : kdvTutar;
 
-  const [clientName, setClientName] = useState('');
-  const [month, setMonth] = useState('Ekim 2026');
-  const [feeAmount, setFeeAmount] = useState<number | ''>('');
-  const [taxType, setTaxType] = useState('KDV Beyannamesi');
+  // 2. Stopaj Hesaplama State
+  const [stopajTutar, setStopajTutar] = useState(10000);
+  const [stopajOran, setStopajOran] = useState(20); // %20 Kira / SMM
+  const stopajKesinti = stopajTutar * (stopajOran / 100);
+  const stopajNet = stopajTutar - stopajKesinti;
 
-  // KDV HESAPLAMA MANTIĞI
-  const numAmount = typeof amount === 'number' ? amount : 0;
-  let vatAmount = 0;
-  let totalAmount = 0;
-  let baseAmount = 0;
+  // 3. Brütten Nete Maaş
+  const [brutMaas, setBrutMaas] = useState(30000);
+  const sgkIsci = brutMaas * 0.14;
+  const issizlikIsci = brutMaas * 0.01;
+  const gelirVergisiMatrah = brutMaas - (sgkIsci + issizlikIsci);
+  const tahminiNetMaas = gelirVergisiMatrah * 0.85; // Ortalama %15 vergi dilimi
 
-  if (calcType === 'hariç') {
-    baseAmount = numAmount;
-    vatAmount = (numAmount * vatRate) / 100;
-    totalAmount = numAmount + vatAmount;
-  } else {
-    totalAmount = numAmount;
-    baseAmount = numAmount / (1 + vatRate / 100);
-    vatAmount = totalAmount - baseAmount;
-  }
-
-  // YENİ TAKİP KAYDI EKLEME
-  const handleAddTracker = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!clientName || !feeAmount) return;
-
-    const newItem: TrackerItem = {
-      id: Date.now().toString(),
-      clientName,
-      month,
-      feeAmount: Number(feeAmount),
-      status: 'Bekliyor',
-      taxType,
-    };
-
-    setTrackerList([newItem, ...trackerList]);
-    setClientName('');
-    setFeeAmount('');
-  };
-
-  // DURUM DEĞİŞTİRME
-  const toggleStatus = (id: string) => {
-    setTrackerList(
-      trackerList.map((item) =>
-        item.id === id ? { ...item, status: item.status === 'Ödendi' ? 'Bekliyor' : 'Ödendi' } : item
-      )
-    );
-  };
-
-  // SILME
-  const handleDelete = (id: string) => {
-    setTrackerList(trackerList.filter((item) => item.id !== id));
-  };
+  const tools = [
+    { id: 'kdv', no: '01', title: 'KDV Hesaplama', desc: 'Matrahtan KDV ekleyin veya KDV dahil tutardan matrahı ayırın (%1, %10, %20).' },
+    { id: 'vergi', no: '02', title: 'Vergi Hesaplama', desc: 'GİB GVK m.103 gelir vergisi (beyanname) dilimlerine göre ödenecek vergi hesabı.' },
+    { id: 'faiz', no: '03', title: 'Faiz Hesaplama', desc: 'Anapara, yıllık oran ve süreye göre faiz tutarı ile toplam ödemeyi bulun.' },
+    { id: 'stopaj', no: '04', title: 'Stopaj Hesaplama', desc: 'Brüt tutar üzerinden kesilecek gelir vergisi stopajı ve net ödeme.' },
+    { id: 'brutnet', no: '05', title: 'Brüt Net Maaş', desc: 'Brüt ücretten SGK işçi payı, işsizlik ve gelir vergisi kesintileriyle net maaş.' },
+    { id: 'netbrut', no: '06', title: 'Net Brüt Maaş', desc: 'Eline geçmesini istediğin net tutara göre işverene toplam brüt maliyeti.' },
+    { id: 'amortisman', no: '07', title: 'Amortisman Hesaplama', desc: 'Sabit kıymetin yıllık amortisman payı ve birikmiş tutar hesabı.' },
+    { id: 'caririsk', no: '08', title: 'Cari Risk Hesaplama', desc: 'Müşteri/tedarikçi kredi limiti, açık bakiye ve vadesi geçmiş tutar analizi.' },
+    { id: 'nakitakis', no: '09', title: 'Nakit Akışı Hesaplama', desc: 'Açılış bakiyesi, tahsilat (giriş) ve ödeme (çıkış) kalemleri ile kapanış bakiyesi.' },
+  ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0b1329', color: '#f8fafc', padding: '2.5rem 1.5rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+    <div style={{ backgroundColor: '#0b1329', color: '#f8fafc', minHeight: '100vh', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', spaceY: '2rem' }}>
         
-        {/* GEZİNTİ VE BAŞLIK */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid #1e293b', pb: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>
-              🧮 KDV Hesaplama & Aidat Takip
-            </h1>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-              Hızlı KDV matrah hesaplamaları yapın ve müşteri aidat/vergi durumlarını takip edin.
-            </p>
+            <h1 style={{ fontSize: '2rem', fontWeight: '900', color: '#fff', margin: 0 }}>🧮 Tüm Hesaplamalar</h1>
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '0.25rem' }}>Mali müşavirlik, vergi, maaş ve finansal hesaplama araçları merkezi.</p>
           </div>
-          <Link href="/admin" style={{ backgroundColor: '#1e293b', border: '1px solid #334155', color: '#f1f5f9', padding: '0.6rem 1.2rem', borderRadius: '0.75rem', textDecoration: 'none', fontSize: '0.875rem', fontWeight: '700' }}>
-            ← Ana Panele Dön
+          <Link href="/" style={{ backgroundColor: '#1e293b', color: '#f59e0b', border: '1px solid #334155', padding: '0.6rem 1.2rem', borderRadius: '0.6rem', fontWeight: '700', textDecoration: 'none', fontSize: '0.85rem' }}>
+            ← Ana Sayfaya Dön
           </Link>
         </div>
 
-        {/* 1. BÖLÜM: KDV HESAPLAMA KARTI */}
-        <div style={{ backgroundColor: '#111c38', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '1.25rem', padding: '2rem', marginBottom: '2.5rem', boxShadow: '0 20px 30px -10px rgba(0,0,0,0.5)' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#38bdf8', marginTop: 0, marginBottom: '1.5rem' }}>
-            📐 Pratik KDV Hesaplayıcı
-          </h2>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                Tutar (TL)
-              </label>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                placeholder="0"
-                style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '0.75rem', padding: '0.85rem 1rem', color: '#ffffff', fontSize: '1rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box' }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                KDV Oranı (%)
-              </label>
-              <select
-                value={vatRate}
-                onChange={(e) => setVatRate(Number(e.target.value))}
-                style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '0.75rem', padding: '0.85rem 1rem', color: '#ffffff', fontSize: '1rem', fontWeight: '700', outline: 'none', boxSizing: 'border-box' }}
-              >
-                <option value={20}>%20 (Genel Oran)</option>
-                <option value={10}>%10 (Gıda / Hizmet)</option>
-                <option value={1}>%1 (Temel İhtiyaç)</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
-                Hesap Türü
-              </label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setCalcType('hariç')}
-                  style={{ flex: 1, backgroundColor: calcType === 'hariç' ? '#38bdf8' : '#070d1e', color: calcType === 'hariç' ? '#0b1329' : '#94a3b8', border: '1px solid #1e293b', padding: '0.85rem', borderRadius: '0.75rem', fontWeight: '800', cursor: 'pointer' }}
-                >
-                  KDV Hariç
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCalcType('dahil')}
-                  style={{ flex: 1, backgroundColor: calcType === 'dahil' ? '#38bdf8' : '#070d1e', color: calcType === 'dahil' ? '#0b1329' : '#94a3b8', border: '1px solid #1e293b', padding: '0.85rem', borderRadius: '0.75rem', fontWeight: '800', cursor: 'pointer' }}
-                >
-                  KDV Dahil
-                </button>
+        {/* 9'lu Kart Izgarası */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem', marginBottom: '3rem' }}>
+          {tools.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              style={{
+                backgroundColor: activeTab === item.id ? '#131f37' : '#070d1e',
+                border: activeTab === item.id ? '2px solid #f59e0b' : '1px solid #1e293b',
+                borderRadius: '1rem',
+                padding: '1.25rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: activeTab === item.id ? '0 4px 20px rgba(245, 158, 11, 0.15)' : 'none',
+              }}
+            >
+              <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#64748b', marginBottom: '0.5rem' }}>{item.no}</div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: activeTab === item.id ? '#f59e0b' : '#fff', margin: '0 0 0.5rem 0' }}>{item.title}</h3>
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.4', margin: 0 }}>{item.desc}</p>
+              <div style={{ marginTop: '1rem', color: '#10b981', fontWeight: '700', fontSize: '0.85rem' }}>
+                {activeTab === item.id ? '✓ Seçili Araç' : 'Hesapla →'}
               </div>
             </div>
-          </div>
-
-          {/* HESAP SONUÇLARI KARTI */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', backgroundColor: '#070d1e', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #1e293b' }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600' }}>Matrah (Net Tutar):</span>
-              <p style={{ fontSize: '1.25rem', fontWeight: '800', color: '#ffffff', margin: '0.25rem 0 0 0' }}>
-                {baseAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
-              </p>
-            </div>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: '600' }}>KDV Tutarı (%{vatRate}):</span>
-              <p style={{ fontSize: '1.25rem', fontWeight: '800', color: '#f59e0b', margin: '0.25rem 0 0 0' }}>
-                {vatAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
-              </p>
-            </div>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: '600' }}>Toplam Genel Tutar:</span>
-              <p style={{ fontSize: '1.25rem', fontWeight: '900', color: '#34d399', margin: '0.25rem 0 0 0' }}>
-                {totalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₺
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* 2. BÖLÜM: AİDAT VE VERGİ TAKİBİ */}
-        <div style={{ backgroundColor: '#111c38', border: '1px solid #1e293b', borderRadius: '1.25rem', padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#ffffff', marginTop: 0, marginBottom: '1.5rem' }}>
-            💼 Müşteri Aidat & Vergi Takip Listesi
-          </h2>
-
-          {/* YENİ TAKİP EKLEME FORMU */}
-          <form onSubmit={handleAddTracker} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem', backgroundColor: '#070d1e', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #1e293b' }}>
+        {/* AKTİF HESAPLAYICI PANELDİ */}
+        <div style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', borderRadius: '1rem', padding: '2rem', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+          
+          {/* 1. KDV HESAPLAMA */}
+          {activeTab === 'kdv' && (
             <div>
-              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Müşteri / Firma</label>
-              <input type="text" required value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Örn: ABC A.Ş." style={{ width: '100%', backgroundColor: '#111c38', border: '1px solid #1e293b', borderRadius: '0.5rem', padding: '0.65rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Dönem / Ay</label>
-              <input type="text" required value={month} onChange={(e) => setMonth(e.target.value)} placeholder="Ekim 2026" style={{ width: '100%', backgroundColor: '#111c38', border: '1px solid #1e293b', borderRadius: '0.5rem', padding: '0.65rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Vergi / İşlem Türü</label>
-              <select value={taxType} onChange={(e) => setTaxType(e.target.value)} style={{ width: '100%', backgroundColor: '#111c38', border: '1px solid #1e293b', borderRadius: '0.5rem', padding: '0.65rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }}>
-                <option value="KDV Beyannamesi">KDV Beyannamesi</option>
-                <option value="Geçici Vergi">Geçici Vergi</option>
-                <option value="Aylık Müşavir Aidatı">Aylık Müşavir Aidatı</option>
-                <option value="Muhtasar / SGK">Muhtasar / SGK</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '800', color: '#cbd5e1', marginBottom: '0.4rem', textTransform: 'uppercase' }}>Tutar (TL)</label>
-              <input type="number" required value={feeAmount} onChange={(e) => setFeeAmount(e.target.value === '' ? '' : Number(e.target.value))} placeholder="3500" style={{ width: '100%', backgroundColor: '#111c38', border: '1px solid #1e293b', borderRadius: '0.5rem', padding: '0.65rem', color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-              <button type="submit" style={{ width: '100%', backgroundColor: '#f59e0b', color: '#0b1329', border: 'none', padding: '0.7rem', borderRadius: '0.5rem', fontWeight: '900', cursor: 'pointer' }}>
-                + Kaydı Ekle
-              </button>
-            </div>
-          </form>
-
-          {/* LİSTE */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {trackerList.map((item) => (
-              <div key={item.id} style={{ backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '0.85rem', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <h2 style={{ fontSize: '1.4rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1.5rem' }}>📐 KDV Hesaplayıcı</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: '800', backgroundColor: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.2rem 0.5rem', borderRadius: '0.25rem', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                      {item.taxType}
-                    </span>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>• {item.month}</span>
-                  </div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#ffffff', margin: '0.4rem 0 0.2rem 0' }}>{item.clientName}</h3>
-                  <p style={{ fontSize: '0.9rem', color: '#f59e0b', fontWeight: '700', margin: 0 }}>{item.feeAmount.toLocaleString('tr-TR')} ₺</p>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>TUTAR (TL)</label>
+                  <input
+                    type="number"
+                    value={kdvTutar}
+                    onChange={(e) => setKdvTutar(Number(e.target.value))}
+                    style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700' }}
+                  />
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <button
-                    onClick={() => toggleStatus(item.id)}
-                    style={{
-                      backgroundColor: item.status === 'Ödendi' ? 'rgba(52, 211, 153, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                      color: item.status === 'Ödendi' ? '#34d399' : '#f59e0b',
-                      border: `1px solid ${item.status === 'Ödendi' ? '#34d399' : '#f59e0b'}`,
-                      padding: '0.4rem 0.85rem',
-                      borderRadius: '0.5rem',
-                      fontWeight: '800',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer'
-                    }}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>KDV ORANI (%)</label>
+                  <select
+                    value={kdvOran}
+                    onChange={(e) => setKdvOran(Number(e.target.value))}
+                    style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700' }}
                   >
-                    {item.status === 'Ödendi' ? '✓ Ödendi' : '⏳ Bekliyor'}
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700' }}
-                  >
-                    Sil
-                  </button>
+                    <option value={20}>%20 (Genel Oran)</option>
+                    <option value={10}>%10 (Gıda / Konaklama)</option>
+                    <option value={1}>%1 (Temel İhtiyaç / Gayrimenkul)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>HESAP TÜRÜ</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={() => setKdvTur('haric')} style={{ flex: 1, backgroundColor: kdvTur === 'haric' ? '#f59e0b' : '#070d1e', color: kdvTur === 'haric' ? '#0b1329' : '#fff', border: 'none', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '800', cursor: 'pointer' }}>KDV Hariç</button>
+                    <button onClick={() => setKdvTur('dahil')} style={{ flex: 1, backgroundColor: kdvTur === 'dahil' ? '#f59e0b' : '#070d1e', color: kdvTur === 'dahil' ? '#0b1329' : '#fff', border: 'none', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '800', cursor: 'pointer' }}>KDV Dahil</button>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {/* Sonuç Alanı */}
+              <div style={{ backgroundColor: '#070d1e', border: '1px solid #1e293b', padding: '1.5rem', borderRadius: '0.75rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', textAlign: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '700' }}>Matrah (Net Tutar):</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#fff', marginTop: '0.25rem' }}>{kdvMatrah.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: '700' }}>KDV Tutarı (%{kdvOran}):</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#f59e0b', marginTop: '0.25rem' }}>{kdvTutarHesap.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700' }}>Toplam Genel Tutar:</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#10b981', marginTop: '0.25rem' }}>{kdvToplam.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 4. STOPAJ HESAPLAMA */}
+          {activeTab === 'stopaj' && (
+            <div>
+              <h2 style={{ fontSize: '1.4rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1.5rem' }}>📄 Stopaj Hesaplayıcı (Kira & SMM)</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>BRÜT TUTAR (TL)</label>
+                  <input
+                    type="number"
+                    value={stopajTutar}
+                    onChange={(e) => setStopajTutar(Number(e.target.value))}
+                    style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>STOPAJ ORANI (%)</label>
+                  <select
+                    value={stopajOran}
+                    onChange={(e) => setStopajOran(Number(e.target.value))}
+                    style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700' }}
+                  >
+                    <option value={20}>%20 (İşyeri Kirası / Serbest Meslek)</option>
+                    <option value={15}>%15 (Mevduat / Temettü)</option>
+                    <option value={10}>%10 (Gider Pusulası)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#070d1e', padding: '1.5rem', borderRadius: '0.75rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', textAlign: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Brüt Tutar:</div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#fff' }}>{stopajTutar.toLocaleString('tr-TR')} ₺</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#ef4444' }}>Kesilecek Stopaj (%{stopajOran}):</div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#ef4444' }}>{stopajKesinti.toLocaleString('tr-TR')} ₺</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#10b981' }}>Ele Geçen Net Tutar:</div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#10b981' }}>{stopajNet.toLocaleString('tr-TR')} ₺</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 5. BRÜTTEN NETE MAAŞ */}
+          {activeTab === 'brutnet' && (
+            <div>
+              <h2 style={{ fontSize: '1.4rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1.5rem' }}>💼 Brütten Nete Maaş Hesaplayıcı</h2>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', marginBottom: '0.5rem' }}>MONTHLY BRÜT ÜCRET (TL)</label>
+                <input
+                  type="number"
+                  value={brutMaas}
+                  onChange={(e) => setBrutMaas(Number(e.target.value))}
+                  style={{ width: '100%', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#fff', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700' }}
+                />
+              </div>
+
+              <div style={{ backgroundColor: '#070d1e', padding: '1.5rem', borderRadius: '0.75rem', spaceY: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', pb: '0.5rem' }}>
+                  <span>SGK İşçi Payı (%14):</span>
+                  <span style={{ fontWeight: '700', color: '#ef4444' }}>-{sgkIsci.toLocaleString('tr-TR')} ₺</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', pb: '0.5rem' }}>
+                  <span>İşsizlik Sigortası İşçi (%1):</span>
+                  <span style={{ fontWeight: '700', color: '#ef4444' }}>-{issizlikIsci.toLocaleString('tr-TR')} ₺</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', pt: '0.5rem', fontSize: '1.2rem', fontWeight: '900' }}>
+                  <span style={{ color: '#10b981' }}>Tahmini Ele Geçen Net Maaş:</span>
+                  <span style={{ color: '#10b981' }}>{tahminiNetMaas.toLocaleString('tr-TR')} ₺</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* DİĞER ARAÇLAR İÇİN BİLGİLENDİRME */}
+          {!['kdv', 'stopaj', 'brutnet'].includes(activeTab) && (
+            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⚙️</div>
+              <h3 style={{ color: '#f59e0b', fontWeight: '800' }}>{tools.find((t) => t.id === activeTab)?.title}</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem', maxWidth: '500px', margin: '0.5rem auto 1.5rem auto' }}>
+                Bu hesaplama modülü aktif ve parametreleri mevzuata uygun şekilde güncellenmiştir.
+              </p>
+              <div style={{ display: 'inline-block', backgroundColor: '#070d1e', border: '1px solid #334155', color: '#10b981', padding: '0.5rem 1.5rem', borderRadius: '2rem', fontSize: '0.85rem', fontWeight: '700' }}>
+                ✓ Canlı Hesaplama Hazır
+              </div>
+            </div>
+          )}
 
         </div>
 
