@@ -17,7 +17,7 @@ export default function HomePage() {
 
       {/* Header */}
       <header style={{ borderBottom: '1px solid #1e293b', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', itemsCenter: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ backgroundColor: '#f59e0b', color: '#0b1329', fontWeight: '900', fontSize: '1.2rem', width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             B
           </div>
