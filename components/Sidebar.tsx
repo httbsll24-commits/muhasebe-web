@@ -32,13 +32,13 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Profil Kartı */}
+        {/* Müşteri Profil Özeti */}
         <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', padding: '0.85rem', borderRadius: '0.75rem', marginBottom: '1.5rem' }}>
           <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>MÜŞTERİ PORTALI</div>
           <div style={{ fontSize: '0.95rem', fontWeight: '700', color: '#fff', marginTop: '0.25rem' }}>Hatice Başol</div>
         </div>
 
-        {/* Navigasyon Linkleri */}
+        {/* Ana Navigasyon */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -69,30 +69,23 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Alt Araçlar ve Ana Sayfa Butonu */}
-      <div style={{ marginTop: '2rem', borderTop: '1px solid #1e293b', paddingTop: '1.25rem' }}>
-        <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px', marginBottom: '0.75rem', paddingLeft: '0.5rem' }}>
+      {/* Yönetim Araçları */}
+      <div style={{ marginTop: '2rem', borderTop: '1px solid #1e293b', paddingTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+        <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px', marginBottom: '0.25rem', paddingLeft: '0.5rem' }}>
           YÖNETİM ARAÇLARI
         </div>
         
-        <Link
-          href="/"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            padding: '0.8rem 1rem',
-            borderRadius: '0.6rem',
-            backgroundColor: 'rgba(245, 158, 11, 0.15)',
-            border: '1px solid rgba(245, 158, 11, 0.4)',
-            color: '#f59e0b',
-            fontWeight: '800',
-            fontSize: '0.85rem',
-            textDecoration: 'none',
-            textAlign: 'center',
-          }}
-        >
+        <Link href="/admin/calc" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1rem', borderRadius: '0.6rem', backgroundColor: '#131f37', border: '1px solid #334155', color: '#f59e0b', fontWeight: '800', fontSize: '0.85rem', textDecoration: 'none' }}>
+          <span>🧮</span>
+          <span>KDV / Hesaplayıcı</span>
+        </Link>
+
+        <Link href="/admin" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.75rem 1rem', borderRadius: '0.6rem', backgroundColor: '#131f37', border: '1px solid #334155', color: '#fff', fontWeight: '800', fontSize: '0.85rem', textDecoration: 'none' }}>
+          <span>⚙️</span>
+          <span>Admin Paneli</span>
+        </Link>
+
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem 1rem', borderRadius: '0.6rem', backgroundColor: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.4)', color: '#f59e0b', fontWeight: '800', fontSize: '0.85rem', textDecoration: 'none', marginTop: '0.5rem' }}>
           <span>🏠</span>
           <span>Ana Sayfaya Dön</span>
         </Link>
