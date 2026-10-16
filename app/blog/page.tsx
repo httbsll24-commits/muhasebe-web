@@ -1,8 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 export default function BlogPage() {
   const posts = [
@@ -38,13 +36,32 @@ export default function BlogPage() {
   return (
     <div style={{ backgroundColor: '#0b1329', color: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontFamily: 'sans-serif' }}>
       
-      {/* Üst Gezinti Menüsü (Navbar) */}
-      <Navbar />
+      {/* ÜST MENÜ (NAVBAR / HEADER) */}
+      <header style={{ backgroundColor: '#070d1e', borderBottom: '1px solid #1e293b', padding: '1rem 2rem' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+            <div style={{ backgroundColor: '#f59e0b', color: '#0b1329', fontWeight: '900', width: '2.5rem', height: '2.5rem', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+              HB
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '900', margin: 0, color: '#fff', letterSpacing: '0.5px' }}>BAŞOL</h3>
+              <span style={{ fontSize: '0.65rem', color: '#f59e0b', fontWeight: '800', letterSpacing: '1px' }}>MALİ MÜŞAVİRLİK</span>
+            </div>
+          </Link>
 
-      {/* Blog İçeriği */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', width: '100%', padding: '3rem 1rem flexGrow: 1' }}>
-        
-        {/* Header */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <Link href="/" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem' }}>Ana Sayfa</Link>
+            <Link href="/hakkimizda" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem' }}>Hakkımızda</Link>
+            <Link href="/hizmetlerimiz" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem' }}>Hizmetlerimiz</Link>
+            <Link href="/blog" style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: '800', fontSize: '0.9rem' }}>Blog</Link>
+            <Link href="/iletisim" style={{ color: '#cbd5e1', textDecoration: 'none', fontWeight: '700', fontSize: '0.9rem' }}>İletişim</Link>
+            <Link href="/dashboard" style={{ backgroundColor: '#f59e0b', color: '#0b1329', padding: '0.5rem 1rem', borderRadius: '0.5rem', fontWeight: '900', textDecoration: 'none', fontSize: '0.85rem' }}>Müşteri Portalı</Link>
+          </nav>
+        </div>
+      </header>
+
+      {/* BLOG İÇERİĞİ */}
+      <main style={{ maxWidth: '1100px', margin: '0 auto', width: '100%', padding: '3rem 1rem', flex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', borderBottom: '1px solid #1e293b', paddingBottom: '1.5rem' }}>
           <div>
             <div style={{ fontSize: '0.8rem', color: '#f59e0b', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>MALİ REHBER</div>
@@ -73,7 +90,7 @@ export default function BlogPage() {
         </div>
 
         {/* Blog Kartları Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.75rem', marginBottom: '3rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.75rem' }}>
           {posts.map((post) => (
             <article
               key={post.id}
@@ -87,7 +104,6 @@ export default function BlogPage() {
                 boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
               }}
             >
-              {/* Resim */}
               <div style={{ width: '100%', height: '200px', overflow: 'hidden', position: 'relative' }}>
                 <img
                   src={post.image}
@@ -106,14 +122,12 @@ export default function BlogPage() {
                     fontWeight: '800',
                     padding: '0.3rem 0.6rem',
                     borderRadius: '0.4rem',
-                    backdropFilter: 'blur(4px)',
                   }}
                 >
                   {post.category}
                 </span>
               </div>
 
-              {/* İçerik */}
               <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '700', marginBottom: '0.5rem' }}>
@@ -136,11 +150,20 @@ export default function BlogPage() {
             </article>
           ))}
         </div>
+      </main>
 
-      </div>
-
-      {/* Alt Kurumsal Bilgi (Footer) */}
-      <Footer />
+      {/* ALT BİLGİ (FOOTER) */}
+      <footer style={{ backgroundColor: '#070d1e', borderTop: '1px solid #1e293b', padding: '2rem 1rem', marginTop: 'auto' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ color: '#fff', fontWeight: '800', fontSize: '0.95rem' }}>Başol Serbest Muhasebeci Mali Müşavirlik</div>
+            <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '0.2rem' }}>© 2026 Tüm Hakları Saklıdır.</div>
+          </div>
+          <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+            📍 İstanbul, Türkiye • ✉️ info@basol-muhasebe.com
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
