@@ -78,7 +78,7 @@ export default function AdminPostsPage() {
           </Link>
         </div>
 
-        {/* Yeni Gönderi Oluşturma Formu */}
+        {/* Form */}
         <div style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.5rem', marginBottom: '2.5rem', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1.25rem' }}>➕ Yeni Haber / Duyuru Ekle</h2>
           
@@ -141,7 +141,7 @@ export default function AdminPostsPage() {
           </form>
         </div>
 
-        {/* Mevcut Gönderiler Listesi */}
+        {/* Liste */}
         <div>
           <h2 style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '800', marginBottom: '1rem' }}>📋 Yayımlanan Haber ve Duyurular ({posts.length})</h2>
           
@@ -153,7 +153,7 @@ export default function AdminPostsPage() {
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                    <span style={{ backgroundColor: post.category === 'Duyuru' ? '#3b82f6' : '#10b981', color: '#fff', fontSize: '0.65rem', fontWeight: '800', padding: '0.2rem 0.5rem', borderRadius: '0.25rem', uppercase: 'uppercase' }}>
+                    <span style={{ backgroundColor: post.category === 'Duyuru' ? '#3b82f6' : '#10b981', color: '#fff', fontSize: '0.65rem', fontWeight: '800', padding: '0.2rem 0.5rem', borderRadius: '0.25rem', textTransform: 'uppercase' }}>
                       {post.category}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#64748b' }}>• {post.date}</span>
@@ -164,7 +164,7 @@ export default function AdminPostsPage() {
 
                 <button
                   onClick={() => handleDelete(post.id)}
-                  style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.4rem 0.8rem', borderRadius: '0.4rem', fontWeight: '700', fontSize: '0.75rem', cursor: 'pointer', shrink: 0, marginLeft: '1rem' }}
+                  style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.4rem 0.8rem', borderRadius: '0.4rem', fontWeight: '700', fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0, marginLeft: '1rem' }}
                 >
                   🗑️ Sil
                 </button>
