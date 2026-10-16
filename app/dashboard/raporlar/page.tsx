@@ -18,7 +18,7 @@ export default function RaporlarDashboardPage() {
         </div>
 
         {/* Özet Skor Kartı */}
-        <div style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.5rem', marginBottom: '2rem', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', textAlign: 'center' }}>
+        <div style={{ backgroundColor: '#131f37', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.5rem', marginBottom: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', textAlign: 'center' }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '700' }}>3. ÇEYREK TOPLAM CİRO</div>
             <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#10b981', marginTop: '0.25rem' }}>1.450.000 ₺</div>
@@ -46,7 +46,7 @@ export default function RaporlarDashboardPage() {
           
           <div style={{ backgroundColor: '#070d1e', border: '1px solid #1e293b', borderRadius: '1rem', padding: '1.5rem' }}>
             <h3 style={{ fontSize: '1.1rem', color: '#f59e0b', fontWeight: '800', marginBottom: '1rem' }}>📈 KDV & Matrah Dengesi</h3>
-            <div style={{ spaceY: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
                   <span>Hesaplanan KDV (Satışlar):</span>
@@ -56,7 +56,7 @@ export default function RaporlarDashboardPage() {
                   <div style={{ width: '80%', backgroundColor: '#10b981', height: '100%' }}></div>
                 </div>
               </div>
-              <div style={{ marginTop: '1rem' }}>
+              <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
                   <span>İndirilecek KDV (Alışlar):</span>
                   <span style={{ fontWeight: '800', color: '#ef4444' }}>184.000 ₺</span>

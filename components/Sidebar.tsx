@@ -13,27 +13,28 @@ export default function Sidebar() {
     { name: 'Evraklar', icon: '📁', href: '/dashboard/evraklar' },
     { name: 'Gelir / Gider', icon: '💰', href: '/dashboard/gelir-gider' },
     { name: 'Raporlar', icon: '📈', href: '/dashboard/raporlar' },
+    { name: 'Tahsilat & Aidat', icon: '💳', href: '/dashboard/tahsilat' },
     { name: 'Bildirimler', icon: '🔔', href: '/dashboard/bildirimler' },
     { name: 'Hesap Ayarları', icon: '⚙️', href: '/dashboard/ayarlar' },
   ];
 
   return (
-    <aside style={{ width: '280px', backgroundColor: '#070d1e', borderRight: '1px solid #1e293b', minHeight: '100vh', padding: '1.5rem 1rem', color: '#f8fafc', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between' }}>
+    <aside style={{ width: '280px', backgroundColor: '#070d1e', borderRight: '1px solid #1e293b', minHeight: '100vh', padding: '1.5rem 1rem', color: '#f8fafc', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       <div>
-        {/* Logo ve Üst Başlık */}
+        {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem', paddingLeft: '0.5rem' }}>
           <div style={{ backgroundColor: '#f59e0b', color: '#0b1329', fontWeight: '900', width: '2.5rem', height: '2.5rem', borderRadius: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)' }}>
-            B
+            HB
           </div>
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#fff', tracking: '0.5px' }}>BAŞOL</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#fff', letterSpacing: '0.5px' }}>BAŞOL</h3>
             <span style={{ fontSize: '0.65rem', color: '#f59e0b', fontWeight: '800', letterSpacing: '1px' }}>MALİ MÜŞAVİRLİK</span>
           </div>
         </div>
 
         {/* Profil Kartı */}
         <div style={{ backgroundColor: '#0b1329', border: '1px solid #1e293b', padding: '0.85rem', borderRadius: '0.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '700', uppercase: 'uppercase', letterSpacing: '0.5px' }}>MÜŞTERİ PORTALI</div>
+          <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>MÜŞTERİ PORTALI</div>
           <div style={{ fontSize: '0.95rem', fontWeight: '700', color: '#fff', marginTop: '0.25rem' }}>Hatice Başol</div>
         </div>
 
